@@ -16,9 +16,11 @@ class Robot
   INITIAL_WEAPON = nil
   MINIMUM_HEALTH = 0
   MAXIMUM_HEALTH = 100
+  INITIAL_SHIELD = 50
+  @@all_robots = []
 
   attr_reader :items, :xpos, :ypos
-  attr_accessor :equipped_weapon, :health
+  attr_accessor :equipped_weapon, :health, :shield_points
 
   def initialize 
     @xpos = INITIAL_ON_X_AXIS
@@ -26,11 +28,50 @@ class Robot
     @items = []
     @health = INITIAL_HEALTH
     @equipped_weapon = INITIAL_WEAPON
+    @shield_points = INITIAL_SHIELD
+    @@all_robots << self
   end
 
   def position
     [@xpos, @ypos]
   end
+
+  def scanning
+    # neighbor = []
+    # other_robot = Robot.all_position
+    # other_robot.delete(self.position)
+    # other_robot.select do |robot_position|
+    #   dx = (robot_position[0] - xpos)
+    #   dy = (robot_position[1] - ypos)
+    #   if dx.abs <= 1 && dy.abs <= 1
+    #     neighbor << [dx,dy] 
+    #   end
+    # end
+    # neighbor
+    
+  end
+
+  #Class Method
+  def self.all
+    @@all_robots
+    # ObjectSpace.each_object(self).to_a
+  end
+
+  # def self.all_position
+  #   self.all.map { |robot| robot.position }
+  # end
+
+  def self.in_position(x,y)
+    robots_in_position = []
+    self.all.each do |robot| 
+      if robot.position ==  [x,y]
+        robots_in_position << robot
+      end
+    end
+    robots_in_position
+  end
+
+
 
   #Movements
   def move_left
@@ -73,8 +114,22 @@ class Robot
   def wound(damage_taken) 
     # @health -= damage_taken
     # @health = 0 if @health < 0
-    @health = [MINIMUM_HEALTH, (@health - damage_taken)].max
+    shield_points_left = @shield_points - damage_taken
+
+    if shield_points_left > 0
+      @shield_points = [0, (@shield_points - damage_taken)].max
+    elsif shield_points_left < 0 
+      @health = [MINIMUM_HEALTH, (@health + shield_points_left)].max
+      @shield_points = 0
+    elsif shield_points == 0
+      @health = [MINIMUM_HEALTH, (@health - damage_taken)].max
+    end
   end
+
+  def wound_through_shield(damage_taken)
+     @health = [MINIMUM_HEALTH, (@health - damage_taken)].max
+   end
+
 
   def heal(revival_points)
     # @health += revival_points

@@ -8,12 +8,12 @@ describe Robot do
 
   describe "#is_dead?" do
     it "returns true if robot's health is 0" do
-      @robot.wound(@robot.health + 10)
+      @robot.wound(@robot.health + 60)
       expect(@robot.is_dead?).to be true
     end
 
     it "returns false if robot's health > 0" do
-      @robot.wound(@robot.health - 10)
+      @robot.wound(@robot.health - 60)
       expect(@robot.is_dead?).to be false
     end
 
@@ -21,14 +21,14 @@ describe Robot do
 
   describe "#heal!" do 
     it "should raise an exception if robot is dead" do
-      @robot.wound(@robot.health + 10)
+      @robot.wound(@robot.health + 60)
       expect { @robot.heal!(20) }.to raise_error(Robot::RobotAlreadyDeadError)
     end
 
     it "should not raise an exception if robot is still alive" do
-      @robot.wound(@robot.health - 10)
+      @robot.wound(80)
       @robot.heal!(20)
-      expect(@robot.health).to eq(30)
+      expect(@robot.health).to eq(90)
     end
   end
 
@@ -41,7 +41,7 @@ describe Robot do
     it "should not raise an exception only if enemy is a Robot" do
       another_robot = Robot.new
       @robot.attack(another_robot)
-      expect(another_robot.health).to eq(95)
+      expect(another_robot.health).to eq(100)
     end
 
   end
