@@ -36,19 +36,17 @@ class Robot
     [@xpos, @ypos]
   end
 
+  def self.clear
+    @@all_robots = []
+  end
+
   def scanning
-    # neighbor = []
-    # other_robot = Robot.all_position
-    # other_robot.delete(self.position)
-    # other_robot.select do |robot_position|
-    #   dx = (robot_position[0] - xpos)
-    #   dy = (robot_position[1] - ypos)
-    #   if dx.abs <= 1 && dy.abs <= 1
-    #     neighbor << [dx,dy] 
-    #   end
-    # end
-    # neighbor
-    
+    neighbor = []
+    neighbor.concat(Robot.in_position(xpos + 1, ypos))
+    neighbor.concat(Robot.in_position(xpos - 1, ypos))
+    neighbor.concat(Robot.in_position(xpos, ypos + 1))
+    neighbor.concat(Robot.in_position(xpos, ypos - 1))
+    neighbor
   end
 
   #Class Method
@@ -57,13 +55,9 @@ class Robot
     # ObjectSpace.each_object(self).to_a
   end
 
-  # def self.all_position
-  #   self.all.map { |robot| robot.position }
-  # end
-
   def self.in_position(x,y)
     robots_in_position = []
-    self.all.each do |robot| 
+    @@all_robots.each do |robot| 
       if robot.position ==  [x,y]
         robots_in_position << robot
       end
@@ -153,19 +147,57 @@ class Robot
     distance = (self.xpos - enemy.xpos).abs + (self.ypos - enemy.ypos).abs 
   end
 
-  def attack(enemy)
-    if enemy.is_a? Robot
-      if distance_from_enemy(enemy) <= 2 && (@equipped_weapon.is_a? Grenade)
-          @equipped_weapon.hit(enemy)
-          @equipped_weapon = nil
 
-      elsif distance_from_enemy(enemy) <= 1
-        if @equipped_weapon.is_a? Weapon
-          @equipped_weapon.hit(enemy)
+  def attack(enemy)
+
+    if enemy.is_a? Robot
+
+      if distance_from_enemy(enemy) >1 && distance_from_enemy(enemy) <= 2 
+        if self.equipped_weapon.is_a? Grenade
+          self.equipped_weapon.hit(enemy)
+          self.equipped_weapon = nil
+        end
+
+      elsif distance_from_enemy(enemy) <= 1 
+
+        if self.equipped_weapon.is_a? SpecialWeapon
+
+          self.scanning.each do | enemy | 
+            self.equipped_weapon.hit(enemy)
+          end
+          self.equipped_weapon = nil
+
+        elsif self.equipped_weapon.is_a? Weapon
+          self.equipped_weapon.hit(enemy)
+
         else
           enemy.wound(DEFAULT_ATTACK_POWER)
-        end
+        end  
+
       end
+          
+
+      # if (@equipped_weapon.is_a? Grenade) && distance_from_enemy(enemy) <= 2 
+      #     @equipped_weapon.hit(enemy)
+      #     @equipped_weapon = nil
+      
+
+      # elsif (@equipped_weapon.is_a? SpecialWeapon) && distance_from_enemy(enemy) <= 1 
+         
+      #   self.scanning.each do | enemy | 
+      #     @equipped_weapon.hit(enemy)
+      #   end
+      #   @equipped_weapon = nil
+      
+            
+      # elsif distance_from_enemy(enemy) <= 1
+      #   # binding.pry
+      #   if @equipped_weapon.is_a? Weapon
+      #     @equipped_weapon.hit(enemy)
+      #   else
+      #     enemy.wound(DEFAULT_ATTACK_POWER)
+      #   end
+      # end
 
     else
       raise Robot::UnattackableEnemy

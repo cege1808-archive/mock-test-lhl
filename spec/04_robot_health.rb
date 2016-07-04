@@ -46,7 +46,7 @@ describe Robot do
       # the second robot will have had #wound method called on it
       # and 5 (the default attack hitpoints) will be passed into that method call
       expect(robot2).to receive(:wound).with(5)
-
+   
       # This is what will trigger the wound to happen on robot2
       @robot.attack(robot2)
     end

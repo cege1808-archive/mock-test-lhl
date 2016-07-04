@@ -5,6 +5,10 @@ require_relative 'spec_helper'
 
 describe 'Robot' do
   describe '#scanning' do
+    before :each do
+      Robot.clear
+    end
+
     it "should scan its surrounding tiles for other robots" do
       robot1 = Robot.new
       robot2 = Robot.new
@@ -12,12 +16,16 @@ describe 'Robot' do
       robot4 = Robot.new
       robot5 = Robot.new
 
-      expect(robot2).to receive(:position).and_return([-1,0])
-      expect(robot3).to receive(:position).and_return([1,0])
-      expect(robot4).to receive(:position).and_return([0,1])
-      expect(robot5).to receive(:position).and_return([1,1])
 
-      expect(robot1.scanning).to eq([robot2,robot3,robot4])  
+
+      expect(robot2).to receive(:position).at_least(:once).and_return([-1,0])
+      expect(robot3).to receive(:position).at_least(:once).and_return([1,0])
+      expect(robot4).to receive(:position).at_least(:once).and_return([0,1])
+      expect(robot5).to receive(:position).at_least(:once).and_return([1,1])
+
+      # binding.pry
+
+      expect(robot1.scanning).to eq([robot3,robot2,robot4])  
     end
 
 

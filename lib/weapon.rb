@@ -12,4 +12,6 @@ class Weapon < Item
     enemy.wound(damage)
   end
 
+
+
 end
